@@ -70,6 +70,8 @@ namespace DreamDazzles.API.Controllers
 
                 objresp = await _productService.GetAllProducts(traceId, token);
 
+
+
                 _logger.Information($"{methodName} - {httpMethod} Exit | trace: " + traceId);
 
                 return returnAction(objresp);
