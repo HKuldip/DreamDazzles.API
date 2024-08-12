@@ -62,7 +62,7 @@ namespace DreamDazzles.Repository.Repositories
                         response.IsSuccess = false;
                         response.StatusCode = HttpStatusCode.InternalServerError;
 
-                        return response;
+                        return response;  
                     }
                     await _userManager.AddToRoleAsync(user, register.Role);
                     var userData = await _userManager.FindByEmailAsync(register.Email);
