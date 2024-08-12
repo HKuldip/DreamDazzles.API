@@ -29,11 +29,11 @@ namespace DreamDazzles.Service.Service
             }
         }
 
-        public async Task<ClientResponse> GetProductById(int id, string traceid, CancellationToken token = default)
+        public async Task<ClientResponse> GetProductByIdAsync(int id, string traceid, CancellationToken token = default)
         {
             try
             {
-                return await _productRepository.GetProductById(id, traceid, token);
+                return await _productRepository.GetProductByIdAsync(id, traceid, token);
             }
             catch (Exception ex)
             {

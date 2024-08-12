@@ -18,7 +18,7 @@ namespace DreamDazzles.API.Controllers
             _productService = productService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetProduct/{id}")]
         public async Task<IActionResult> GetProduct(int id, CancellationToken token = default)
         {
 
@@ -33,11 +33,13 @@ namespace DreamDazzles.API.Controllers
                 MinorCode = CodeMinorValueType.unauthorizedrequest
             };
 
-            objresp = await _productService.GetProductById(id,traceId,token);
+            objresp = await _productService.GetProductByIdAsync(id,traceId,token);
             
             return Ok(objresp);
          
         }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
         {

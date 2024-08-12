@@ -7,6 +7,8 @@ using Asp.Versioning;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using DreamDazzle.Model.Data;
+using DreamDazzle.Model.User;
+using Microsoft.AspNetCore.Identity;
 
 
 try
@@ -27,6 +29,8 @@ try
     services.AddDbContext<MainDBContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
     services.ConfigureDIServices();
+    services.AddIdentity<AspNetUsers, AspNetRoles>()
+.AddDefaultTokenProviders();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
     services.AddApiVersioning(config =>
@@ -75,7 +79,7 @@ try
             policy.AllowAnyOrigin();
         });
     });
-
+ 
     var app = builder.Build();
     {
         app.UseCors("CORSPolicy");
@@ -103,16 +107,16 @@ try
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
-        app.UseStaticFiles(new StaticFileOptions()
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
-            RequestPath = new PathString("/wwwroot")
+        //app.UseStaticFiles(new StaticFileOptions()
+        //{
+        //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
+        //    RequestPath = new PathString("/wwwroot")
 
-            #region CodeLevelExample        
-            //var folderName = Path.Combine("wwwroot", "store");
-            //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            #endregion
-        });
+        //    #region CodeLevelExample        
+        //    //var folderName = Path.Combine("wwwroot", "store");
+        //    //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        //    #endregion
+        //});
 
         app.UseAuthorization();
 
