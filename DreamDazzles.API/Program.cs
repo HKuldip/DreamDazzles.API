@@ -7,7 +7,16 @@ using Asp.Versioning;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using DreamDazzle.Model.Data;
+using Serilog;
+using DreamDazzles.Service;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using DreamDazzle.Model;
+using Microsoft.IdentityModel.Logging;
 
+var Envplatform = string.Empty;
+StaticLogger.EnsureInitialized();
+Log.Information("Dream Dazzles API is booting up...");
 
 try
 {
@@ -16,16 +25,25 @@ try
     string[]? origins = new string[3];
     var builder = WebApplication.CreateBuilder(args);
 
+    Envplatform = builder.Configuration["app:name"];
+
     // Add services to the container.
-
+    // Clear default logging providers and configure your logger (e.g., Serilog).
+    builder.Logging.ClearProviders();
+    // Configure your logger here (e.g., Serilog, NLog, etc.).
+    #region ConfigSerilog
+    Log.Logger = new LoggerConfiguration().CreateBootstrapLogger();
+    builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
+    #endregion
     var services = builder.Services;
-
+    IdentityModelEventSource.ShowPII = true;
     services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     services.AddEndpointsApiExplorer();
     //services.AddSwaggerGen();
     services.AddDbContext<MainDBContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
     services.ConfigureDIServices();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
@@ -36,6 +54,31 @@ try
         config.ReportApiVersions = true;
         config.ApiVersionReader = new UrlSegmentApiVersionReader();// new HeaderApiVersionReader("api-version");
     });
+    services.AddIdentity<User, IdentityRole>()
+        .AddEntityFrameworkStores<MainDBContext>()
+        .AddDefaultTokenProviders();
+
+    services.Configure<IdentityOptions>(options =>
+    {
+        // Password settings.
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequiredUniqueChars = 1;
+
+        // Lockout settings.
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        // User settings.
+        options.User.AllowedUserNameCharacters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        options.User.RequireUniqueEmail = true;
+    });
+
 
     services.AddSwaggerGen(options =>
     {
@@ -78,6 +121,7 @@ try
 
     var app = builder.Build();
     {
+        app.Logger.LogInformation("PublicApi App created...");
         app.UseCors("CORSPolicy");
         var versionSet = app.NewApiVersionSet()
                         .HasApiVersion(2.0)
@@ -126,10 +170,14 @@ try
 catch (Exception ex)
 {
 
-    throw;
+    StaticLogger.EnsureInitialized();
+    Log.Fatal(ex.InnerException + " Ex message " + ex.Message + ", Platoform name :" + Envplatform, "Unhandled exception");
 }
 finally
 {
     // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
     //NLog.LogManager.Shutdown();
+    StaticLogger.EnsureInitialized();
+    Log.Information("Server Shutting down...");
+    Log.CloseAndFlush();
 }

@@ -68,7 +68,7 @@ namespace DreamDazzles.API.Controllers
             {
                 _logger.Information($"{methodName} - {httpMethod} Entered | trace: " + traceId);
 
-                objresp = await _productService.GetAllProducts();
+                objresp = await _productService.GetAllProducts(traceId, token);
 
                 _logger.Information($"{methodName} - {httpMethod} Exit | trace: " + traceId);
 

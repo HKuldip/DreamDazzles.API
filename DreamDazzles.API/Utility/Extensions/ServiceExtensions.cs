@@ -1,7 +1,10 @@
 ﻿using DreamDazzle.Repository.Interface;
 using DreamDazzle.Repository.Repositories;
 using DreamDazzles.API.Utility.Helper;
+using DreamDazzles.Repository.Interface;
+using DreamDazzles.Repository.Repositories;
 using DreamDazzles.Service.Interface.Product;
+using DreamDazzles.Service.Interface.User;
 using DreamDazzles.Service.Service;
 using LoanCentral.API.Utility.Helper;
 using LoanCentral.API.Utility.Model;
@@ -45,6 +48,9 @@ public static class ServiceExtensions
 
         services.AddTransient<IProductService, ProductService>();
         services.AddTransient<IProductRepository, ProductRepository>();
+
+        services.AddTransient<IUsersService, UsersService>();
+        services.AddTransient<IUsersRepository, UsersRepository>();
 
         //services.AddTransient<IAccountSettingService, AccountSettingService>();
         //services.AddTransient<IAccountSettingRepository, AccountSettingRepository>();
