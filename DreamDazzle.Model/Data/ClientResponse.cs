@@ -40,6 +40,9 @@ namespace DreamDazzle.Model.Data
         public object? HttpResponse { get; set; }
         public SeverityType Severity { get; set; }
         public CodeMinorValueType MinorCode { get; set; }
+
+        public string? APIVersion { get; set; } = null;
+        public string? UserAgent { get; set; } = null;
     }
     /// <summary>
     /// Represents a <see cref="ClientResponse"/> that also contains a Response of type T.
@@ -162,6 +165,9 @@ namespace DreamDazzle.Model.Data
 
         /// <remarks/>
         unsupportedLISoperation,
+
+        /// <remarks/>
+        authorizedrequest,
     }
 
     public class BaseResponse
