@@ -10,6 +10,8 @@ namespace DreamDazzles.Service.Emails
     public interface IEmailSender
     {
         public Task SendEmail(object jobDetails);
+
+
         public Task SendBulkEmailAsync<T>(
             List<EmailRequestDTO> requestDTOs,
             T dynamicTemplateData,

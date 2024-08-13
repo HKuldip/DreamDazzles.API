@@ -7,6 +7,7 @@ namespace DreamDazzle.Model
         public User() : base() { }
         public string? FirstName { get; set; }
         public string? Lastname { get; set; }
+ 
     }
     public class ApplicationRole : IdentityRole
     {
