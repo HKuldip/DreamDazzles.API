@@ -1,4 +1,5 @@
 ﻿using DreamDazzle.Model.Data;
+using DreamDazzles.DTO.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace DreamDazzles.Repository.Interface
     public interface IUsersRepository
     {
         Task<ClientResponse> UserAddAsync(string Password, string traceid, CancellationToken token = default);
+        Task<ClientResponse> UserLoginAsync(Login login);
     }
 }

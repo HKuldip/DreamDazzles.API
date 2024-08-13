@@ -64,5 +64,13 @@ namespace DreamDazzles.Service
 
             return new string(chars.ToArray());
         }
+
+
+        public static int GenerateOtp(PasswordOptions opts = null)
+        {
+            Random random = new Random();
+            int randomNumber = random.Next(100000, 1000000); // Generates a number between 100000 and 999999
+            return randomNumber;
+        }
     }
 }

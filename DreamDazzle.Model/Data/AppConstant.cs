@@ -37,7 +37,9 @@ namespace DreamDazzle.Model.Data
 
         public const string InValid = "InValid";
         public const string SessionExpired = "SessionExpired";
-        public const string NotFound = " Not found";
+        public const string NotFound = "Not found";
+        public const string LoginFailed = "Not User found";
+        public const string LoginSucess = "User Login successfully";
         public const string NoRecords = " No Records";
     }
 }
