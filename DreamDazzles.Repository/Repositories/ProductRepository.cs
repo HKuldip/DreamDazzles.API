@@ -29,47 +29,55 @@ namespace DreamDazzle.Repository.Repositories
 
 
 
-        public async Task<ClientResponse> GetAllProducts()
+        public async Task<ClientResponse> GetAllProducts(string traceid, CancellationToken token = default)
         {
             ClientResponse<List<ProductDTO>> response = new();
+            string mname = "GetAllProducts";
             response.IsSuccess = false;
             response.HttpRequest = "";
-
-            try
+            if (!token.IsCancellationRequested)
             {
-                var pro = await _context.Product.ToListAsync();
-
-
-                if (pro != null && pro.Count > 0)
+                try
                 {
-                    response.StatusCode = HttpStatusCode.OK;
-                    response.HttpResponse = pro;
-                    response.Severity = SeverityType.status;
-                    response.IsSuccess = true;
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.Product.ToListAsync();
+
+
+                    if (pro != null && pro.Count > 0)
+                    {
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = pro;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+                    }
+
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
                 }
-                else
+                catch (Exception ex)
                 {
-                    response.IsSuccess = false;
-                    response.Message = $"{AppConstant.NoRecords}";
-                    response.StatusCode = HttpStatusCode.NoContent;
-                    response.Severity = SeverityType.warning;
+
+                    response.Message = ex.Message;
                 }
-
-
             }
-            catch (Exception ex)
+            if (token.IsCancellationRequested)
             {
-
-                response.Message = ex.Message;
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
             }
-
             return response;
         }
 
         public async Task<ClientResponse> GetProductByIdAsync(int id, string traceid, CancellationToken token = default)
         {
             ClientResponse<ProductDTO> response = new();
-            string mname = "GetProductById";
+            string mname = "GetProductByIdAsync";
             response.IsSuccess = false;
             response.HttpRequest = "";
             if (!token.IsCancellationRequested)

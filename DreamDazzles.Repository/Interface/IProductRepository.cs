@@ -11,6 +11,6 @@ namespace DreamDazzle.Repository.Interface
     public interface IProductRepository
     {
         Task<ClientResponse> GetProductByIdAsync(int id, string traceid, CancellationToken token = default);
-        Task<ClientResponse> GetAllProducts();
+        Task<ClientResponse> GetAllProducts(string traceid, CancellationToken token = default);
     }
 }

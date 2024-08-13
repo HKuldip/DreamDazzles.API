@@ -1,43 +1,71 @@
-﻿using DreamDazzle.Model.Data;
-using DreamDazzle.Model.User;
-using DreamDazzles.DTO.User;
+﻿using Asp.Versioning;
+using DreamDazzle.Model;
+using DreamDazzle.Model.Data;
+using DreamDazzles.Service;
+using DreamDazzles.Service.Interface.Product;
 using DreamDazzles.Service.Interface.User;
+using DreamDazzles.Service.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DreamDazzles.API.Controllers
 {
-    public class UserController : Controller
+    [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    public class UserController : BaseController<UserController>
     {
-        private readonly UserManager<AspNetUsers> _userManager;
-        private readonly RoleManager<AspNetRoles> _roleManager;
-        private readonly IConfiguration _configuration;
-        private readonly IUserService _user;
+        private readonly IUsersService _usersService;
+        private readonly UserManager<User> _userManager;
 
-        public UserController(UserManager<AspNetUsers> userManager, RoleManager<AspNetRoles> roleManager, IConfiguration configuration, IUserService user)
+        public UserController(IUsersService usersService, UserManager<User> userManager, Serilog.ILogger slogger) : base(slogger)
         {
+            _usersService = usersService;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _user = user;
         }
 
-
-        [HttpPost]
-        [Route("Register")]
-        public async Task<IActionResult> Register(Register register)
+        [HttpGet("GetAllUsers")]
+        [ApiVersion("1.0", Deprecated = true)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetAllUsers(CancellationToken token = default)
         {
-            ClientResponse objresp = new ClientResponse();
+            string methodName = "GetAllUsers";
+            string httpMethod = HttpContext.Request.Method;
+            string traceId = HttpContext.TraceIdentifier;
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { } as object, methodName, httpMethod, traceId, token);
+
             try
             {
+                _logger.Information($"{methodName} - {httpMethod} Entered | trace: " + traceId);
 
-                objresp = await _user.RegisterUser(register);
+                var password = Clscommon.GenerateRandomPassword();
 
-                return Ok(objresp);
+                var user = new User
+                {
+                    UserName = "Test",
+                    FirstName = "Test",
+                    Lastname = "Test",
+                    Email = "Test018@yopmail.com"
+                };
+
+                var result = await _userManager.CreateAsync(user, password);
+
+
+                _logger.Information($"{methodName} - {httpMethod} Exit | trace: " + traceId);
+
+                return returnAction(objresp);
             }
             catch (Exception ex)
             {
-                throw ex;
+                _logger.Error(ex, $"EXCEPTION: {methodName} - {httpMethod} => API ERROR {HttpContext.Request.Path + HttpContext.Request.QueryString} | trace: " + traceId);
+                return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
     }

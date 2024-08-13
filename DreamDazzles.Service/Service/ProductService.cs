@@ -17,11 +17,11 @@ namespace DreamDazzles.Service.Service
             _productRepository = productRepository;
         }
 
-        public async Task<ClientResponse> GetAllProducts()
+        public async Task<ClientResponse> GetAllProducts(string traceid, CancellationToken token = default)
         {
             try
             {
-                return await _productRepository.GetAllProducts();
+                return await _productRepository.GetAllProducts(traceid,token);
             }
             catch (Exception ex)
             {

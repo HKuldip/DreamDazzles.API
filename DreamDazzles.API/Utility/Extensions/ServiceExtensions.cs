@@ -54,8 +54,8 @@ public static class ServiceExtensions
         services.AddTransient<IProductService, ProductService>();
         services.AddTransient<IProductRepository, ProductRepository>();
 
-        services.AddTransient<IUserService, UserService>();
-        services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IUsersService, UsersService>();
+        services.AddTransient<IUsersRepository, UsersRepository>();
 
         //services.AddTransient<IAccountSettingService, AccountSettingService>();
         //services.AddTransient<IAccountSettingRepository, AccountSettingRepository>();

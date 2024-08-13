@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace DreamDazzle.Model.Data
 {
-    public class MainDBContext : DbContext
+    public class MainDBContext : IdentityDbContext<User>
     {
         public MainDBContext(DbContextOptions<MainDBContext> options) : base(options) { }
 
