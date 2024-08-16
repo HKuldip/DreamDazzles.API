@@ -1,19 +1,10 @@
-﻿using DreamDazzle.Model.Data;
+﻿using DreamDazzle.Model;
+using DreamDazzle.Model.Data;
 using DreamDazzle.Repository.Interface;
 using DreamDazzles.DTO.User;
 using DreamDazzles.Repository.Interface;
-using DreamDazzles.Service.Interface.User;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using DreamDazzles.Service.Interface;
+ 
 
 namespace DreamDazzles.Service.Service
 {
@@ -27,6 +18,21 @@ namespace DreamDazzles.Service.Service
         {
             _usersRepository = usersRepository;
         }
+
+        public async Task<string> SendForgotPasswordEmail(User user, string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _usersRepository.SendForgotPasswordEmail(user, traceid, token);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+           
+        }
+      
         public async Task<ClientResponse> UserAddAsync(string Password, string traceid, CancellationToken token = default)
         {
             try
@@ -40,11 +46,25 @@ namespace DreamDazzles.Service.Service
             }
         }
 
-        public async Task<ClientResponse> UserLogin(Login login)
+        public async Task<ClientResponse> UserLogin(Login login, string traceid, CancellationToken token = default)
         {
             try
             {
-                return await _usersRepository.UserLoginAsync(login);
+                return await _usersRepository.UserLoginAsync(login, traceid,token);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
+        public async Task<ClientResponse> ResetPassword(ResetPassword reset, string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _usersRepository.ResetPassword(reset, traceid, token);
             }
             catch (Exception)
             {

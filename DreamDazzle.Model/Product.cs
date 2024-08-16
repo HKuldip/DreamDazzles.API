@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace DreamDazzle.Model
 {
-
-
     public class Product
     {
         public int ProductID { get; set; }

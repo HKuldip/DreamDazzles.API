@@ -1,13 +1,16 @@
-﻿using DreamDazzle.Repository.Interface;
+﻿using DreamDazzle.Model.Data;
+using DreamDazzle.Model.User;
+using DreamDazzle.Repository.Interface;
 using DreamDazzle.Repository.Repositories;
 using DreamDazzles.API.Utility.Helper;
 using DreamDazzles.Repository.Interface;
 using DreamDazzles.Repository.Repositories;
 using DreamDazzles.Service.Interface.Product;
-using DreamDazzles.Service.Interface.User;
+using DreamDazzles.Service.Interface;
 using DreamDazzles.Service.Service;
 using LoanCentral.API.Utility.Helper;
 using LoanCentral.API.Utility.Model;
+ 
 
 namespace DreamDazzles.API.Utility.Extensions;
 public static class ServiceExtensions
@@ -44,6 +47,8 @@ public static class ServiceExtensions
         //services.AddSingleton(mapper);
         //services.AddEmailClient();
 
+
+
         services.AddTransient<IAuthenticationService, AuthenticationService>();
 
         services.AddTransient<IProductService, ProductService>();
@@ -51,6 +56,11 @@ public static class ServiceExtensions
 
         services.AddTransient<IUsersService, UsersService>();
         services.AddTransient<IUsersRepository, UsersRepository>();
+
+        services.AddTransient<IEmailService, EmailService>();
+ 
+
+
 
         //services.AddTransient<IAccountSettingService, AccountSettingService>();
         //services.AddTransient<IAccountSettingRepository, AccountSettingRepository>();

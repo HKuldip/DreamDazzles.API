@@ -13,6 +13,10 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using DreamDazzle.Model;
 using Microsoft.IdentityModel.Logging;
+using DreamDazzles.Service.Emails;
+using DreamDazzles.Service.Interface;
+using DreamDazzles.Service.Service;
+
 
 var Envplatform = string.Empty;
 StaticLogger.EnsureInitialized();
@@ -41,10 +45,15 @@ try
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     services.AddEndpointsApiExplorer();
     //services.AddSwaggerGen();
+    var configuration = builder.Configuration;
     services.AddDbContext<MainDBContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+
     services.ConfigureDIServices();
+    services.AddIdentity<AspNetUsers, AspNetRoles>()
+.AddDefaultTokenProviders();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
     services.AddApiVersioning(config =>
@@ -78,6 +87,16 @@ try
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
         options.User.RequireUniqueEmail = true;
     });
+
+
+
+    builder.Services.Configure<IdentityOptions>(opts=>opts.SignIn.RequireConfirmedEmail = true);
+
+    //add email config
+
+    var emailconfig = configuration.GetSection("EmailConfigration").Get<EmailConfigration>();
+    builder.Services.AddSingleton(emailconfig);
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
 
     services.AddSwaggerGen(options =>
@@ -119,6 +138,9 @@ try
         });
     });
 
+
+
+
     var app = builder.Build();
     {
         app.Logger.LogInformation("PublicApi App created...");
@@ -147,16 +169,16 @@ try
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
-        app.UseStaticFiles(new StaticFileOptions()
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
-            RequestPath = new PathString("/wwwroot")
+        //app.UseStaticFiles(new StaticFileOptions()
+        //{
+        //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
+        //    RequestPath = new PathString("/wwwroot")
 
-            #region CodeLevelExample        
-            //var folderName = Path.Combine("wwwroot", "store");
-            //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            #endregion
-        });
+        //    #region CodeLevelExample        
+        //    //var folderName = Path.Combine("wwwroot", "store");
+        //    //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        //    #endregion
+        //});
 
         app.UseAuthorization();
 

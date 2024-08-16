@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace DreamDazzles.DTO.User
 {
-    internal class Email
+    public class Forgotmail
     {
+
+        public string FirstName { get; set; }
+        public string Email { get; set; }
     }
 }

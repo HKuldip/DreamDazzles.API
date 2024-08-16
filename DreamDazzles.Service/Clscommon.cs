@@ -72,5 +72,16 @@ namespace DreamDazzles.Service
             int randomNumber = random.Next(100000, 1000000); // Generates a number between 100000 and 999999
             return randomNumber;
         }
+
+        public static string FirstLetterToUpper(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            input = input.ToLower(); // Convert the entire string to lowercase
+            return char.ToUpper(input[0]) + input.Substring(1);
+        }
+
+
     }
 }
