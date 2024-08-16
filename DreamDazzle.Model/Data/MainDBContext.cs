@@ -14,6 +14,7 @@ namespace DreamDazzle.Model.Data
 
         //public DbSet<Form> Forms { get; set; }
         public DbSet<Product> Product { get; set; }
+ 
 
         #endregion
         /// <summary>

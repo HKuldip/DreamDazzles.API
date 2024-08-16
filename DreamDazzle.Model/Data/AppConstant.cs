@@ -41,5 +41,8 @@ namespace DreamDazzle.Model.Data
         public const string LoginFailed = "Not User found";
         public const string LoginSucess = "User Login successfully";
         public const string NoRecords = " No Records";
+        public const string EmailExist = "Your Email Already Exist...";
+        public const string ProfileCreateSuccess = "Your Profile Create Successfully...";
+        public const string IncorrectPasswordandUser = "Your Username And Password Incorrect...";
     }
 }

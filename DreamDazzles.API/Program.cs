@@ -13,6 +13,10 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using DreamDazzle.Model;
 using Microsoft.IdentityModel.Logging;
+using DreamDazzles.Service.Emails;
+using DreamDazzles.Service.Interface;
+using DreamDazzles.Service.Service;
+
 
 var Envplatform = string.Empty;
 StaticLogger.EnsureInitialized();
@@ -41,8 +45,11 @@ try
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     services.AddEndpointsApiExplorer();
     //services.AddSwaggerGen();
+    var configuration = builder.Configuration;
     services.AddDbContext<MainDBContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 
     services.ConfigureDIServices();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -78,6 +85,16 @@ try
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
         options.User.RequireUniqueEmail = true;
     });
+
+
+
+    builder.Services.Configure<IdentityOptions>(opts=>opts.SignIn.RequireConfirmedEmail = true);
+
+    //add email config
+
+    var emailconfig = configuration.GetSection("EmailConfigration").Get<EmailConfigration>();
+    builder.Services.AddSingleton(emailconfig);
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
 
     services.AddSwaggerGen(options =>
@@ -118,6 +135,9 @@ try
             policy.AllowAnyOrigin();
         });
     });
+
+
+
 
     var app = builder.Build();
     {

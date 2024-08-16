@@ -1,4 +1,5 @@
-﻿using DreamDazzle.Model.Data;
+﻿using DreamDazzle.Model;
+using DreamDazzle.Model.Data;
 using DreamDazzles.DTO.User;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,11 @@ namespace DreamDazzles.Repository.Interface
     public interface IUsersRepository
     {
         Task<ClientResponse> UserAddAsync(string Password, string traceid, CancellationToken token = default);
-        Task<ClientResponse> UserLoginAsync(Login login);
+        Task<ClientResponse> UserLoginAsync(Login login, string traceid, CancellationToken token = default);
+        Task<ClientResponse> ResetPassword(ResetPassword reset, string traceid, CancellationToken token = default);
+
+        Task<string> SendForgotPasswordEmail(User user, string traceid, CancellationToken token = default);
+
+
     }
 }
