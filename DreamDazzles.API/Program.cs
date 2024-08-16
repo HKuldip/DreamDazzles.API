@@ -52,6 +52,8 @@ try
 
 
     services.ConfigureDIServices();
+    services.AddIdentity<AspNetUsers, AspNetRoles>()
+.AddDefaultTokenProviders();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
     services.AddApiVersioning(config =>
@@ -167,16 +169,16 @@ try
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
-        app.UseStaticFiles(new StaticFileOptions()
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
-            RequestPath = new PathString("/wwwroot")
+        //app.UseStaticFiles(new StaticFileOptions()
+        //{
+        //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
+        //    RequestPath = new PathString("/wwwroot")
 
-            #region CodeLevelExample        
-            //var folderName = Path.Combine("wwwroot", "store");
-            //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            #endregion
-        });
+        //    #region CodeLevelExample        
+        //    //var folderName = Path.Combine("wwwroot", "store");
+        //    //var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        //    #endregion
+        //});
 
         app.UseAuthorization();
 

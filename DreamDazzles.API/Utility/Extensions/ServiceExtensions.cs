@@ -1,4 +1,6 @@
-﻿using DreamDazzle.Repository.Interface;
+﻿using DreamDazzle.Model.Data;
+using DreamDazzle.Model.User;
+using DreamDazzle.Repository.Interface;
 using DreamDazzle.Repository.Repositories;
 using DreamDazzles.API.Utility.Helper;
 using DreamDazzles.Repository.Interface;
@@ -44,6 +46,8 @@ public static class ServiceExtensions
         //IMapper mapper = automapper.CreateMapper();
         //services.AddSingleton(mapper);
         //services.AddEmailClient();
+
+
 
         services.AddTransient<IAuthenticationService, AuthenticationService>();
 
