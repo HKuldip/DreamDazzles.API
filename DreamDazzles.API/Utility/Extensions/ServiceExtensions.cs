@@ -1,5 +1,4 @@
 ﻿using DreamDazzle.Model.Data;
-using DreamDazzle.Model.User;
 using DreamDazzle.Repository.Interface;
 using DreamDazzle.Repository.Repositories;
 using DreamDazzles.API.Utility.Helper;

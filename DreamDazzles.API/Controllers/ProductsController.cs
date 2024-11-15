@@ -51,7 +51,7 @@ namespace DreamDazzles.API.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts(CancellationToken token = default)
         {
             string methodName = "GetProduct";
             string httpMethod = HttpContext.Request.Method;

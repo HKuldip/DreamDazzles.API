@@ -22,16 +22,14 @@ namespace DreamDazzles.API.Controllers
         private readonly IUsersService _usersService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
 
 
 
-        public UserController(IUsersService usersService, UserManager<User> userManager, IEmailService emailService, IConfiguration configuration, Serilog.ILogger slogger) : base(slogger)
+        public UserController(IUsersService usersService, UserManager<User> userManager, IEmailService emailService, Serilog.ILogger slogger) : base(slogger)
         {
             _usersService = usersService;
             _userManager = userManager;
             _emailService = emailService;
-            _configuration = configuration;
 
         }
 
@@ -258,7 +256,6 @@ namespace DreamDazzles.API.Controllers
         }
 
 
-
         [HttpPost("ResetPassword")]
         [ApiVersion("1.0", Deprecated = true)]
         [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
@@ -292,9 +289,6 @@ namespace DreamDazzles.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
-
-
-
 
     }
 }
