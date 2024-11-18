@@ -52,7 +52,7 @@ try
 
 
     services.ConfigureDIServices();
-    services.AddIdentity<AspNetUsers, AspNetRoles>()
+    services.AddIdentity<User, ApplicationRole>()
 .AddDefaultTokenProviders();
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
@@ -90,13 +90,13 @@ try
 
 
 
-    builder.Services.Configure<IdentityOptions>(opts=>opts.SignIn.RequireConfirmedEmail = true);
+    //builder.Services.Configure<IdentityOptions>(opts=>opts.SignIn.RequireConfirmedEmail = true);
 
     //add email config
 
-    var emailconfig = configuration.GetSection("EmailConfigration").Get<EmailConfigration>();
-    builder.Services.AddSingleton(emailconfig);
-    builder.Services.AddScoped<IEmailService, EmailService>();
+    //var emailconfig = configuration.GetSection("EmailConfigration").Get<EmailConfigration>();
+    //builder.Services.AddSingleton(emailconfig);
+    //builder.Services.AddScoped<IEmailService, EmailService>();
 
 
     services.AddSwaggerGen(options =>
