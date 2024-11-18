@@ -58,6 +58,7 @@ namespace DreamDazzles.API.Controllers
                 if (await _emailService.IsEmailExist(Email))
                 {
                     objresp.Message = AppConstant.EmailExist;
+
                     objresp.IsSuccess = false;
                 }
                 else
