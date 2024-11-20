@@ -8,8 +8,8 @@ namespace DreamDazzles.DTO.User
 {
     public class Login
     {
-        public string username { get; set; }
-        public string password { get; set; }
+        public string? username { get; set; }
+        public string? password { get; set; }
     }
 
     public class TokenResponse
@@ -17,5 +17,12 @@ namespace DreamDazzles.DTO.User
         public string? token { get; set; }
         public DateTime? Expiration { get; set; }
 
+    }
+
+    public class SignUp
+    {
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
     }
 }

@@ -44,5 +44,6 @@ namespace DreamDazzle.Model.Data
         public const string EmailExist = "Your Email Already Exist...";
         public const string ProfileCreateSuccess = "Your Profile Create Successfully...";
         public const string IncorrectPasswordandUser = "Your Username And Password Incorrect...";
+        public const string otpsendonemail = "OTP has been sent to your email...";
     }
 }

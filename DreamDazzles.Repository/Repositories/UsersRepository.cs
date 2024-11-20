@@ -173,72 +173,66 @@ namespace DreamDazzles.Repository.Repositories
         }
 
 
-        public async Task<ClientResponse> ResetPassword(ResetPassword data, string traceid, CancellationToken token = default)
+        public async Task<ClientResponse> ResetPassword(ResetPassword data, string traceId, CancellationToken token = default)
         {
-            ClientResponse response = new ClientResponse();
-            string mname = "UserLoginAsync";
-            response.IsSuccess = false;
-            response.HttpRequest = "";
+            ClientResponse response = new ClientResponse
+            {
+                IsSuccess = false,
+                HttpRequest = "",
+                Message = "",
+                StatusCode = HttpStatusCode.InternalServerError
+            };
+            string methodName = "ResetPasswordAsync";
+
             if (!token.IsCancellationRequested)
             {
                 try
                 {
+                    var user = await _userManager.FindByEmailAsync(data.email);
 
-
-                    var resetTokenArray = Convert.FromBase64String(data.Token);
-                    var unprotectedResetTokenArray = _dataProtector.Unprotect(resetTokenArray);
-                    var reader = new BinaryReader(new MemoryStream(unprotectedResetTokenArray));
-                    reader.ReadInt64();
-                    var userId = reader.ReadString();
-
-
-                    var user = await _userManager.FindByIdAsync(userId);
-
-                    if (user != null )
+                    if (user != null)
                     {
-                        var res = await _userManager.ResetPasswordAsync(user, data.Token, data.NewPassword);
-
-                        if (!res.Succeeded)
+                        var res = await _userManager.RemovePasswordAsync(user);
+                        if (res.Succeeded)
                         {
-                            foreach (var error in res.Errors)
-
-                                response.Message = error.Description.ToString();
-                            response.HttpResponse = null;
-                            response.IsSuccess = false;
-                            response.StatusCode = HttpStatusCode.NotModified;
+                            res = await _userManager.AddPasswordAsync(user, data.NewPassword);
+                            if (res.Succeeded)
+                            {
+                                response.Message = "Password reset successfully.";
+                                response.IsSuccess = true;
+                                response.StatusCode = HttpStatusCode.OK;
+                            }
+                            else
+                            {
+                                response.Message = string.Join(", ", res.Errors.Select(e => e.Description));
+                                response.StatusCode = HttpStatusCode.BadRequest;
+                            }
                         }
                         else
                         {
-
-                            response.Message = "Password set Sucessfully";
-                            response.HttpResponse = null;
-                            response.IsSuccess = true;
-                            response.StatusCode = HttpStatusCode.OK;
+                            response.Message = string.Join(", ", res.Errors.Select(e => e.Description));
+                            response.StatusCode = HttpStatusCode.BadRequest;
                         }
                     }
                     else
                     {
-                        response.Message = "No User Found";
-                        response.HttpResponse = null;
-                        response.IsSuccess = false;
-                        response.StatusCode = HttpStatusCode.Unauthorized;
+                        response.Message = "User not found.";
+                        response.StatusCode = HttpStatusCode.NotFound;
                     }
-
-
-
-
-                    return response;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceid);
+                    _logger.LogError($"{methodName}: Error => {ex.Message} | trace: {traceId}");
+                    response.Message = "An error occurred while resetting the password.";
                 }
             }
-            if (token.IsCancellationRequested)
+            else
             {
-                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
-                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+                _logger.LogInformation($"{methodName}: Request was canceled. | trace: {traceId}");
+                response.Message = "Request was canceled.";
+                response.StatusCode = HttpStatusCode.RequestTimeout;
             }
+
             return response;
         }
 

@@ -9,11 +9,6 @@ using Microsoft.AspNetCore.Identity;
  
 using MimeKit;
  
-
-
-
-
-
 namespace DreamDazzles.Service.Service
 {
     public class EmailService : IEmailService
@@ -83,23 +78,26 @@ namespace DreamDazzles.Service.Service
             using var client = new SmtpClient();
             try
             {
-                client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, MailKit.Security.SecureSocketOptions.SslOnConnect);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
+
                 client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
                 client.Send(mailMessage);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine($"Error: {ex.Message}");
                 throw;
             }
             finally
             {
-
                 client.Disconnect(true);
                 client.Dispose();
             }
         }
+
 
 
         public async Task<bool> IsEmailExist(string email)
