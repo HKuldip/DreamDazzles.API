@@ -52,8 +52,10 @@ try
 
 
     services.ConfigureDIServices();
-    services.AddIdentity<AspNetUsers, AspNetRoles>()
-.AddDefaultTokenProviders();
+    builder.Services.AddIdentity<User, ApplicationRole>()
+      .AddEntityFrameworkStores<MainDBContext>()
+      .AddDefaultTokenProviders();
+
     services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     services.AddHttpContextAccessor();
     services.AddApiVersioning(config =>
@@ -63,9 +65,9 @@ try
         config.ReportApiVersions = true;
         config.ApiVersionReader = new UrlSegmentApiVersionReader();// new HeaderApiVersionReader("api-version");
     });
-    services.AddIdentity<User, IdentityRole>()
-        .AddEntityFrameworkStores<MainDBContext>()
-        .AddDefaultTokenProviders();
+    //services.AddIdentity<User, IdentityRole>()
+    //    .AddEntityFrameworkStores<MainDBContext>()
+    //    .AddDefaultTokenProviders();
 
     services.Configure<IdentityOptions>(options =>
     {
@@ -90,7 +92,7 @@ try
 
 
 
-    builder.Services.Configure<IdentityOptions>(opts=>opts.SignIn.RequireConfirmedEmail = true);
+    builder.Services.Configure<IdentityOptions>(opts => opts.SignIn.RequireConfirmedEmail = true);
 
     //add email config
 
@@ -181,7 +183,6 @@ try
         //});
 
         app.UseAuthorization();
-
         app.MapControllers();
 
         app.Run();

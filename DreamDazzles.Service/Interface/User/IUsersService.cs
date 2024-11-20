@@ -1,10 +1,5 @@
 ﻿using DreamDazzle.Model.Data;
 using DreamDazzles.DTO.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DreamDazzle.Model;
 
 
 namespace DreamDazzles.Service.Interface
@@ -17,7 +12,7 @@ namespace DreamDazzles.Service.Interface
         Task<ClientResponse> ResetPassword(ResetPassword reset, string traceid, CancellationToken token = default);
 
 
-        Task<string> SendForgotPasswordEmail(User user, string traceid, CancellationToken token = default);
+        Task<string> SendForgotPasswordEmail(DreamDazzle.Model.User user, string traceid, CancellationToken token = default);
 
 
     }

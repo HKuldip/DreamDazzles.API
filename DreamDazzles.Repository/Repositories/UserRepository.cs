@@ -1,5 +1,5 @@
-﻿using DreamDazzle.Model.Data;
-using DreamDazzle.Model.User;
+﻿using DreamDazzle.Model;
+using DreamDazzle.Model.Data;
 using DreamDazzles.DTO.User;
 using DreamDazzles.Repository.Interface;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +15,10 @@ namespace DreamDazzles.Repository.Repositories
     public class UserRepository : IUserRepository
     {
 
-        private readonly UserManager<AspNetUsers> _userManager;
-        private readonly RoleManager<AspNetRoles> _roleManager;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
-        public UserRepository(UserManager<AspNetUsers> userManager, RoleManager<AspNetRoles> roleManager, IUserRepository userRepo)
+        public UserRepository(UserManager<User> userManager, RoleManager<ApplicationRole> roleManager, IUserRepository userRepo)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -40,7 +40,7 @@ namespace DreamDazzles.Repository.Repositories
                     return response;
                 }
 
-                AspNetUsers user = new()
+                User user = new()
                 {
                     //Email = register.Email,
                     //SecurityStamp = Guid.NewGuid().ToString(),

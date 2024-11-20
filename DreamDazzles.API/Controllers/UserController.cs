@@ -22,16 +22,14 @@ namespace DreamDazzles.API.Controllers
         private readonly IUsersService _usersService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
 
 
 
-        public UserController(IUsersService usersService, UserManager<User> userManager, IEmailService emailService, IConfiguration configuration, Serilog.ILogger slogger) : base(slogger)
+        public UserController(IUsersService usersService, UserManager<User> userManager, IEmailService emailService, Serilog.ILogger slogger) : base(slogger)
         {
             _usersService = usersService;
             _userManager = userManager;
             _emailService = emailService;
-            _configuration = configuration;
 
         }
 
@@ -42,12 +40,12 @@ namespace DreamDazzles.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> AddUsers(string FirstName, string LastName, string Email, CancellationToken token = default)
+        public async Task<IActionResult> AddUsers([FromBody] SignUp Signup, CancellationToken token = default)
         {
             string methodName = "AddUsers";
             string httpMethod = HttpContext.Request.Method;
             string traceId = HttpContext.TraceIdentifier;
-            ClientResponse objresp = await AuthorizedLogRequestAsync(new { FirstName, LastName, Email } as object, methodName, httpMethod, traceId, token);
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { Signup.FirstName, Signup.LastName, Signup.Email } as object, methodName, httpMethod, traceId, token);
 
             try
             {
@@ -55,25 +53,24 @@ namespace DreamDazzles.API.Controllers
 
 
 
-                if (await _emailService.IsEmailExist(Email))
+                if (await _emailService.IsEmailExist(Signup.Email))
                 {
                     objresp.Message = AppConstant.EmailExist;
-
                     objresp.IsSuccess = false;
                 }
                 else
                 {
                     var password = Clscommon.GenerateRandomPassword();
 
-                    var fullname = FirstName + "" + LastName;
+                    var fullname = Signup.FirstName + "" + Signup.LastName;
                     int cnt = _userManager.Users.Count();
                     var user = new User
                     {
                         UserName = fullname + "" + (cnt + 1),
 
-                        FirstName = Clscommon.FirstLetterToUpper(FirstName),
-                        Lastname = Clscommon.FirstLetterToUpper(LastName),
-                        Email = Email,
+                        FirstName = Clscommon.FirstLetterToUpper(Signup.FirstName),
+                        Lastname = Clscommon.FirstLetterToUpper(Signup.LastName),
+                        Email = Signup.Email,
 
                     };
 
@@ -88,7 +85,7 @@ namespace DreamDazzles.API.Controllers
 
                         message.To = new List<MimeKit.MailboxAddress>
                         {
-                            new MimeKit.MailboxAddress("", Email)
+                            new MimeKit.MailboxAddress("", Signup.Email)
                         };
                         message.Content = htmlTemplate.SentPassword;
                         message.Subject = "Password";
@@ -105,7 +102,7 @@ namespace DreamDazzles.API.Controllers
                 }
                 _logger.Information($"{methodName} - {httpMethod} Exit | trace: " + traceId);
 
-                return returnAction(objresp);
+                return Ok(objresp);
             }
             catch (Exception ex)
             {
@@ -185,10 +182,12 @@ namespace DreamDazzles.API.Controllers
 
 
                     _emailService.SendEmail(message, placeholder);
+
+                    objresp.Message = AppConstant.otpsendonemail;
+                    objresp.IsSuccess = true;
+                    objresp.Data = otp;
+                    return Ok(objresp);
                 }
-
-
-
 
                 return Ok(otp);
             }
@@ -238,6 +237,9 @@ namespace DreamDazzles.API.Controllers
                     _logger.Error(message.Content, "");
 
                     _emailService.SendEmail(message, placeholder);
+                    objresp.Message = "Forgot password email sent successfully.";
+                    objresp.IsSuccess = true;
+                    objresp.StatusCode = HttpStatusCode.OK;
 
                 }
                 else
@@ -249,7 +251,7 @@ namespace DreamDazzles.API.Controllers
                     objresp.StatusCode = HttpStatusCode.OK;
                 }
 
-                return returnAction(objresp);
+                return Ok(objresp);
             }
             catch (Exception ex)
             {
@@ -259,7 +261,6 @@ namespace DreamDazzles.API.Controllers
         }
 
 
-
         [HttpPost("ResetPassword")]
         [ApiVersion("1.0", Deprecated = true)]
         [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
@@ -267,7 +268,7 @@ namespace DreamDazzles.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> ResetPassword(ResetPassword reset,CancellationToken token = default)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPassword reset, CancellationToken token = default)
         {
             string methodName = "ResetPassword";
             string httpMethod = HttpContext.Request.Method;
@@ -278,14 +279,19 @@ namespace DreamDazzles.API.Controllers
             {
                 _logger.Information($"{methodName} - {httpMethod} Entered | trace: " + traceId);
 
+                if (reset.NewPassword != reset.ConfirmPassword)
+                {
+                    objresp.Message = "New password and confirm password do not match.";
+                    objresp.IsSuccess = false;
+                    objresp.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(objresp);
+                }
 
-
-                reset.Token = reset.Token.Replace(' ', '+');
                 objresp = await _usersService.ResetPassword(reset, traceId, token);
 
                 _logger.Information($"{methodName} - {httpMethod} Exit | trace: " + traceId);
 
-                return returnAction(objresp);
+                return Ok(objresp);
             }
             catch (Exception ex)
             {
@@ -293,9 +299,6 @@ namespace DreamDazzles.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
-
-
-
 
     }
 }
