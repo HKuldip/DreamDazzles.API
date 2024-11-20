@@ -43,6 +43,8 @@ namespace DreamDazzle.Model.Data
 
         public string? APIVersion { get; set; } = null;
         public string? UserAgent { get; set; } = null;
+        public int Data { get; set; }
+        public object?[] Errors { get; set; }
     }
     /// <summary>
     /// Represents a <see cref="ClientResponse"/> that also contains a Response of type T.

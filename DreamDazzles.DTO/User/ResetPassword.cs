@@ -8,10 +8,12 @@ namespace DreamDazzles.DTO.User
 {
     public class ResetPassword
     {
-        public string Token { get; set; }
+        
 
-        public string NewPassword { get; set; }
 
-        public string ConfirmPassword { get; set; }
+        public string? email { get; set; }
+        public string? NewPassword { get; set; }
+
+        public string? ConfirmPassword { get; set; }
     }
 }
