@@ -44,10 +44,10 @@ namespace DreamDazzles.Repository.Repositories
                 try
                 {
                      var forgottoken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                     string appDomain = _configuration.GetSection("Application:AppDomain").Value;
-                     string forgetlink = _configuration.GetSection("Application:ForgotPassword").Value;
-                     link = string.Format(appDomain + forgetlink, forgottoken);
-                   
+                    string appDomain = _configuration.GetSection("Application:weburl").Value;
+                    string resetPasswordPath = _configuration.GetSection("Application:ResetPasswordPageUrl").Value;
+                    var email = user.Email;
+                    link = string.Format($"{appDomain}{resetPasswordPath}", email);
                 }
                 catch (Exception ex)
                 {
@@ -57,6 +57,7 @@ namespace DreamDazzles.Repository.Repositories
 
             return link;
         }
+     
         public async Task<ClientResponse> UserAddAsync(string Password, string traceid, CancellationToken token = default)
         {
             ClientResponse<ProductDTO> response = new();
@@ -186,10 +187,11 @@ namespace DreamDazzles.Repository.Repositories
 
             if (!token.IsCancellationRequested)
             {
+           
                 try
                 {
                     var user = await _userManager.FindByEmailAsync(data.email);
-
+                 
                     if (user != null)
                     {
                         var res = await _userManager.RemovePasswordAsync(user);
