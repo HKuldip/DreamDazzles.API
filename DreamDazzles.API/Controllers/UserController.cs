@@ -284,7 +284,7 @@ namespace DreamDazzles.API.Controllers
                     objresp.Message = "New password and confirm password do not match.";
                     objresp.IsSuccess = false;
                     objresp.StatusCode = HttpStatusCode.BadRequest;
-                    return BadRequest(objresp);
+                    return Ok(objresp);
                 }
 
                 objresp = await _usersService.ResetPassword(reset, traceId, token);
