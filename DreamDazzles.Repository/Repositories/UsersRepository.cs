@@ -44,6 +44,7 @@ namespace DreamDazzles.Repository.Repositories
                 try
                 {
                      var forgottoken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
                     string appDomain = _configuration.GetSection("Application:weburl").Value;
                     string resetPasswordPath = _configuration.GetSection("Application:ResetPasswordPageUrl").Value;
                     var email = user.Email;
