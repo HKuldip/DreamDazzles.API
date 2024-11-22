@@ -80,6 +80,7 @@ namespace DreamDazzles.API.Controllers
             {
                 var productCategory = await _context.ProductCategories.FindAsync(id);
                 if (productCategory == null)
+
                     return NotFound("Product category not found.");
 
                 _context.ProductCategories.Remove(productCategory);
