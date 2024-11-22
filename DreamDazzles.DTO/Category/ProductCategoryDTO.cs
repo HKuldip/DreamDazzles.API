@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DreamDazzle.Model
+namespace DreamDazzles.DTO
+
 {
-    
-    public class ProductCategory
+    public class ProductCategoryDTO
     {
-
         [Key]
         public Guid ProductCategoryId { get; set; }
         public string? ProductCategoryName { get; set; }
@@ -16,6 +18,5 @@ namespace DreamDazzle.Model
         public bool IsDelete { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
-
     }
 }

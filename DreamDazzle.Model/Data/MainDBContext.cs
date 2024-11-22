@@ -51,14 +51,6 @@ namespace DreamDazzle.Model.Data
             //    .HasKey(x => new { x.FormId, x.QuestionId });
             base.OnModelCreating(builder);
 
-            builder.Entity<SubCategory>()
-                   .HasKey(p => p.SubCategoryId);
-
-            builder.Entity<SubCategory>()
-                   .HasOne<ProductCategory>()
-                   .WithMany()
-                   .HasForeignKey(p => p.ParentsCategory)
-                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ProductCategory>().ToTable("ProductCategory");
             builder.Entity<SubCategory>().ToTable("SubCategory");

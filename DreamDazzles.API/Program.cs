@@ -50,6 +50,7 @@ try
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
+   
 
     services.ConfigureDIServices();
     builder.Services.AddIdentity<User, ApplicationRole>()
@@ -101,6 +102,7 @@ try
     builder.Services.AddScoped<IEmailService, EmailService>();
 
 
+
     services.AddSwaggerGen(options =>
     {
         options.SwaggerDoc("V1", new OpenApiInfo
@@ -140,6 +142,8 @@ try
         });
     });
 
+
+    services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 

@@ -3,6 +3,8 @@ using DreamDazzle.Model.Data;
 using DreamDazzle.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using DreamDazzles.DTO;
 
 namespace DreamDazzles.API.Controllers
 {
@@ -12,108 +14,128 @@ namespace DreamDazzles.API.Controllers
     public class CategoryController : Controller
     {
         private readonly MainDBContext _context;
-        private static List<ProductCategory> _productCategories = new List<ProductCategory>();
+        private readonly IMapper _mapper;
 
-        public CategoryController(MainDBContext context)
+        public CategoryController(IMapper mapper, MainDBContext context)
         {
+            _mapper = mapper;
             _context = context;
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> AddProductCategory([FromBody] ProductCategory productCategory)
+        public async Task<IActionResult> AddProductCategory(ProductCategoryDTO productCategory)
         {
             try
             {
                 if (productCategory == null)
                     return BadRequest("Invalid product category.");
+
                 productCategory.ProductCategoryId = Guid.NewGuid();
                 productCategory.CreatedDate = DateTime.UtcNow;
                 productCategory.IsDelete = false;
-                _context.ProductCategories.Add(productCategory);
+
+                var newModel = _mapper.Map<ProductCategory>(productCategory);
+                await _context.ProductCategories.AddAsync(newModel);
                 await _context.SaveChangesAsync();
 
+                var resultDto = _mapper.Map<ProductCategoryDTO>(newModel);
+                return Ok(resultDto);
             }
             catch (DbUpdateException ex)
             {
                 Console.WriteLine(ex.InnerException?.Message);
+                return StatusCode(500, "An error occurred while saving the product category.");
             }
-            return Ok(productCategory);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditProductCategory(Guid id, ProductCategory updatedCategory)
+        public async Task<IActionResult> EditProductCategory(Guid id, ProductCategoryDTO updatedCategory)
         {
-            var existingCategory = await _context.ProductCategories.FindAsync(id);
-            if (existingCategory == null) return NotFound("Product category not found");
+            try
+            {
 
-            existingCategory.ProductCategoryName = updatedCategory.ProductCategoryName;
-            existingCategory.Description = updatedCategory.Description;
-            existingCategory.CategoryImage = updatedCategory.CategoryImage;
-            existingCategory.IsDelete = updatedCategory.IsDelete;
-            existingCategory.CreatedBy = updatedCategory.CreatedBy;
+                var existingCategory = await _context.ProductCategories.FindAsync(id);
+             
+                if (existingCategory == null)
+                    return NotFound("Product category not found.");
 
-            await _context.SaveChangesAsync();
-            return Ok(existingCategory);
+                _mapper.Map(updatedCategory, existingCategory);
+
+                await _context.SaveChangesAsync();
+
+                var resultDto = _mapper.Map<ProductCategoryDTO>(existingCategory);
+                return Ok(resultDto);
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                return StatusCode(500, "An error occurred while updating the product category.");
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductCategory(Guid id)
         {
-            var productCategory = await _context.ProductCategories.FindAsync(id);
-            if (productCategory == null) return NotFound("Product category not found");
+            try
+            {
+                var productCategory = await _context.ProductCategories.FindAsync(id);
+                if (productCategory == null)
+                    return NotFound("Product category not found.");
 
-            _context.ProductCategories.Remove(productCategory);
-            await _context.SaveChangesAsync();
-            return Ok("Product category deleted");
+                _context.ProductCategories.Remove(productCategory);
+                await _context.SaveChangesAsync();
+
+                return Ok("Product category deleted");
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                return StatusCode(500, "An error occurred while deleting the product category.");
+            }
         }
 
-
         [HttpPost("AddSubCategory")]
-        public async Task<IActionResult> AddSubCategory([FromBody] SubCategory productSubCategorie)
+        public async Task<IActionResult> AddSubCategory([FromBody] SubCategoryDTO productSubCategoryDto)
         {
-            if (productSubCategorie == null) return BadRequest("Invalid data.");
+            if (productSubCategoryDto == null)
+                return BadRequest("Invalid data.");
 
-            // Verify that the ParentsCategory exists
-            var parentCategory = await _context.ProductCategories.FindAsync(productSubCategorie.ParentsCategory);
+            var parentCategory = await _context.ProductCategories.FindAsync(productSubCategoryDto.ParentsCategory);
             if (parentCategory == null)
                 return NotFound("Parent category not found.");
 
-            productSubCategorie.SubCategoryId = Guid.NewGuid();
-            productSubCategorie.CreatedDate = DateTime.UtcNow;
-
-            _context.ProductSubCategories.Add(productSubCategorie);
+            var newSubCategory = _mapper.Map<SubCategory>(productSubCategoryDto);
+            newSubCategory.SubCategoryId = Guid.NewGuid();
+            newSubCategory.CreatedDate = DateTime.UtcNow;
+            newSubCategory.IsDelete = false;
+            _context.ProductSubCategories.Add(newSubCategory);
             await _context.SaveChangesAsync();
 
-            return Ok(productSubCategorie);
+            var resultDto = _mapper.Map<SubCategoryDTO>(newSubCategory);
+            return Ok(resultDto);
         }
 
         [HttpPut("EditSubCategory/{id}")]
-        public async Task<IActionResult> EditSubCategory(Guid id, [FromBody] SubCategory updatedSubCategorie)
+        public async Task<IActionResult> EditSubCategory(Guid id, [FromBody] SubCategoryDTO updatedSubCategoryDto)
         {
             var existingSubCategory = await _context.ProductSubCategories.FindAsync(id);
 
-            if (existingSubCategory == null) return NotFound("Sub-category not found.");
+            if (existingSubCategory == null)
+                return NotFound("Sub-category not found.");
 
-            // Verify that the new ParentsCategory exists
-            if (updatedSubCategorie.ParentsCategory != null)
+            if (updatedSubCategoryDto.ParentsCategory != null)
             {
-                var parentCategory = await _context.ProductCategories.FindAsync(updatedSubCategorie.ParentsCategory);
+                var parentCategory = await _context.ProductCategories.FindAsync(updatedSubCategoryDto.ParentsCategory);
                 if (parentCategory == null)
                     return NotFound("Parent category not found.");
             }
 
-            existingSubCategory.SubCategoryName = updatedSubCategorie.SubCategoryName;
-            existingSubCategory.ParentsCategory = updatedSubCategorie.ParentsCategory;
-            existingSubCategory.Description = updatedSubCategorie.Description;
-            existingSubCategory.SubCategoryImage = updatedSubCategorie.SubCategoryImage;
-            existingSubCategory.IsDelete = updatedSubCategorie.IsDelete;
-            existingSubCategory.CreatedBy = updatedSubCategorie.CreatedBy;
+            _mapper.Map(updatedSubCategoryDto, existingSubCategory);
 
-            _context.ProductSubCategories.Update(existingSubCategory);
             await _context.SaveChangesAsync();
 
-            return Ok(existingSubCategory);
+            var resultDto = _mapper.Map<SubCategoryDTO>(existingSubCategory);
+            return Ok(resultDto);
         }
 
         [HttpDelete("DeleteSubCategory/{id}")]
@@ -121,7 +143,8 @@ namespace DreamDazzles.API.Controllers
         {
             var subCategory = await _context.ProductSubCategories.FindAsync(id);
 
-            if (subCategory == null) return NotFound("Sub-category not found.");
+            if (subCategory == null)
+                return NotFound("Sub-category not found.");
 
             _context.ProductSubCategories.Remove(subCategory);
             await _context.SaveChangesAsync();

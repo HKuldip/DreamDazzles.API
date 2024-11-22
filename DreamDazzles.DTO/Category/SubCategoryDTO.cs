@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DreamDazzle.Model
+namespace DreamDazzles.DTO
 {
-    public class SubCategory
+    public class SubCategoryDTO
     {
         [Key]
         public Guid SubCategoryId { get; set; }
