@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace DreamDazzle.Model.Data
 {
@@ -14,7 +15,10 @@ namespace DreamDazzle.Model.Data
 
         //public DbSet<Form> Forms { get; set; }
         public DbSet<Product> Product { get; set; }
- 
+     
+
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+       public DbSet<SubCategory> ProductSubCategories { get; set; }
 
         #endregion
         /// <summary>
@@ -45,8 +49,15 @@ namespace DreamDazzle.Model.Data
 
             //builder.Entity<FormQuestion>()
             //    .HasKey(x => new { x.FormId, x.QuestionId });
-
             base.OnModelCreating(builder);
+
+
+            builder.Entity<ProductCategory>().ToTable("ProductCategory");
+            builder.Entity<SubCategory>().ToTable("SubCategory");
         }
+       
+
+
+
     }
 }

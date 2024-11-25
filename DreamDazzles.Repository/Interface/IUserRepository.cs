@@ -1,4 +1,5 @@
 ﻿using DreamDazzle.Model.Data;
+using DreamDazzles.DTO;
 using DreamDazzles.DTO.User;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,6 @@ namespace DreamDazzles.Repository.Interface
     public interface IUserRepository
     {
         Task<ClientResponse> RegisterUser(Register register);
+      
     }
 }
