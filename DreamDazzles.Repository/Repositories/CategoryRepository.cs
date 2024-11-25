@@ -63,8 +63,6 @@ namespace DreamDazzles.Repository.Repositories
                             existing.Description = productCategoryDTO.Description;
                             existing.IsDelete = productCategoryDTO.IsDelete;
                             existing.CategoryImage = productCategoryDTO.CategoryImage;
-
-
                             _context.ProductCategories.Update(existing);
                         }
                     }
