@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DreamDazzle.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace DreamDazzles.DTO
         public bool IsDelete { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
+        public ActionEnum Action { get; set; }
     }
 }

@@ -5,151 +5,142 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using DreamDazzles.DTO;
+using Newtonsoft.Json.Linq;
+using DreamDazzles.Service.Interface.Product;
+using DreamDazzles.Service.Interface.Category;
+using DreamDazzles.Service.Service;
+using DreamDazzles.DTO.User;
 
 namespace DreamDazzles.API.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class CategoryController : Controller
+    public class CategoryController : BaseController<CategoryController>
     {
-        private readonly MainDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(IMapper mapper, MainDBContext context)
+        public CategoryController(ICategoryService categoryService, Serilog.ILogger slogger) : base(slogger)
         {
-            _mapper = mapper;
-            _context = context;
+            _categoryService = categoryService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddProductCategory(ProductCategoryDTO productCategory)
+        [HttpPost("AddProductCategory")]
+        [ApiVersion("1.0", Deprecated = true)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    
+        public async Task<IActionResult> AddProductCategory(ProductCategoryDTO productCategoryDTO, CancellationToken token = default)
         {
+            #region asdd
+            string methodName = "AddeditProductCategory";
+            string httpMethod = HttpContext.Request.Method;
+            string traceId = HttpContext.TraceIdentifier;
+            #endregion
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { } as object, methodName, httpMethod, traceId, token);
             try
             {
-                if (productCategory == null)
-                    return BadRequest("Invalid product category.");
+                objresp = await _categoryService.AddProductCategory(productCategoryDTO, traceId, token);
 
-                productCategory.ProductCategoryId = Guid.NewGuid();
-                productCategory.CreatedDate = DateTime.UtcNow;
-                productCategory.IsDelete = false;
-
-                var newModel = _mapper.Map<ProductCategory>(productCategory);
-                await _context.ProductCategories.AddAsync(newModel);
-                await _context.SaveChangesAsync();
-
-                var resultDto = _mapper.Map<ProductCategoryDTO>(newModel);
-                return Ok(resultDto);
+                return Ok(objresp);
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException?.Message);
-                return StatusCode(500, "An error occurred while saving the product category.");
+                _logger.Error(ex, $"EXCEPTION: {methodName} - {httpMethod} => API ERROR {HttpContext.Request.Path + HttpContext.Request.QueryString} | trace: " + traceId);
+                return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> EditProductCategory(Guid id, ProductCategoryDTO updatedCategory)
+
+        [HttpPost("DeleteProductCategory")]
+        [ApiVersion("1.0", Deprecated = true)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+        public async Task<IActionResult> DeleteProductCategory(Guid ProductCategoryId, CancellationToken token = default)
         {
+            #region asdd
+            string methodName = "DeleteProductCategory";
+            string httpMethod = HttpContext.Request.Method;
+            string traceId = HttpContext.TraceIdentifier;
+            #endregion
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { } as object, methodName, httpMethod, traceId, token);
             try
             {
+                objresp = await _categoryService.DeleteProductCategory(ProductCategoryId, traceId, token);
 
-                var existingCategory = await _context.ProductCategories.FindAsync(id);
-             
-                if (existingCategory == null)
-                    return NotFound("Product category not found.");
-
-                _mapper.Map(updatedCategory, existingCategory);
-
-                await _context.SaveChangesAsync();
-
-                var resultDto = _mapper.Map<ProductCategoryDTO>(existingCategory);
-                return Ok(resultDto);
+                return Ok(objresp);
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException?.Message);
-                return StatusCode(500, "An error occurred while updating the product category.");
+                _logger.Error(ex, $"EXCEPTION: {methodName} - {httpMethod} => API ERROR {HttpContext.Request.Path + HttpContext.Request.QueryString} | trace: " + traceId);
+                return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProductCategory(Guid id)
-        {
-            try
-            {
-                var productCategory = await _context.ProductCategories.FindAsync(id);
-                if (productCategory == null)
-                    return NotFound("Product category not found.");
-
-                _context.ProductCategories.Remove(productCategory);
-                await _context.SaveChangesAsync();
-
-                return Ok("Product category deleted");
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                return StatusCode(500, "An error occurred while deleting the product category.");
-            }
-        }
 
         [HttpPost("AddSubCategory")]
-        public async Task<IActionResult> AddSubCategory([FromBody] SubCategoryDTO productSubCategoryDto)
+        [ApiVersion("1.0", Deprecated = true)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+        public async Task<IActionResult> AddSubCategory(SubCategoryDTO subCategory, CancellationToken token = default)
         {
-            if (productSubCategoryDto == null)
-                return BadRequest("Invalid data.");
-
-            var parentCategory = await _context.ProductCategories.FindAsync(productSubCategoryDto.ParentsCategory);
-            if (parentCategory == null)
-                return NotFound("Parent category not found.");
-
-            var newSubCategory = _mapper.Map<SubCategory>(productSubCategoryDto);
-            newSubCategory.SubCategoryId = Guid.NewGuid();
-            newSubCategory.CreatedDate = DateTime.UtcNow;
-            newSubCategory.IsDelete = false;
-            _context.ProductSubCategories.Add(newSubCategory);
-            await _context.SaveChangesAsync();
-
-            var resultDto = _mapper.Map<SubCategoryDTO>(newSubCategory);
-            return Ok(resultDto);
-        }
-
-        [HttpPut("EditSubCategory/{id}")]
-        public async Task<IActionResult> EditSubCategory(Guid id, [FromBody] SubCategoryDTO updatedSubCategoryDto)
-        {
-            var existingSubCategory = await _context.ProductSubCategories.FindAsync(id);
-
-            if (existingSubCategory == null)
-                return NotFound("Sub-category not found.");
-
-            if (updatedSubCategoryDto.ParentsCategory != null)
+            #region asdd
+            string methodName = "AddeditSubCategory";
+            string httpMethod = HttpContext.Request.Method;
+            string traceId = HttpContext.TraceIdentifier;
+            #endregion
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { } as object, methodName, httpMethod, traceId, token);
+            try
             {
-                var parentCategory = await _context.ProductCategories.FindAsync(updatedSubCategoryDto.ParentsCategory);
-                if (parentCategory == null)
-                    return NotFound("Parent category not found.");
+                objresp = await _categoryService.AddSubCategory(subCategory, traceId, token);
+
+                return Ok(objresp);
             }
-
-            _mapper.Map(updatedSubCategoryDto, existingSubCategory);
-
-            await _context.SaveChangesAsync();
-
-            var resultDto = _mapper.Map<SubCategoryDTO>(existingSubCategory);
-            return Ok(resultDto);
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"EXCEPTION: {methodName} - {httpMethod} => API ERROR {HttpContext.Request.Path + HttpContext.Request.QueryString} | trace: " + traceId);
+                return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
+            }
         }
 
-        [HttpDelete("DeleteSubCategory/{id}")]
-        public async Task<IActionResult> DeleteSubCategory(Guid id)
+        [HttpPost("DeletesubCategory")]
+        [ApiVersion("1.0", Deprecated = true)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+        public async Task<IActionResult> DeleteSubCategory(Guid SubCategoryId, CancellationToken token = default)
         {
-            var subCategory = await _context.ProductSubCategories.FindAsync(id);
+            #region asdd
+            string methodName = "DeletesubCategory";
+            string httpMethod = HttpContext.Request.Method;
+            string traceId = HttpContext.TraceIdentifier;
+            #endregion
+            ClientResponse objresp = await AuthorizedLogRequestAsync(new { } as object, methodName, httpMethod, traceId, token);
+            try
+            {
+                objresp = await _categoryService.DeleteSubCategory(SubCategoryId, traceId, token);
 
-            if (subCategory == null)
-                return NotFound("Sub-category not found.");
-
-            _context.ProductSubCategories.Remove(subCategory);
-            await _context.SaveChangesAsync();
-
-            return Ok("Product Sub category deleted");
+                return Ok(objresp);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"EXCEPTION: {methodName} - {httpMethod} => API ERROR {HttpContext.Request.Path + HttpContext.Request.QueryString} | trace: " + traceId);
+                return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
+            }
         }
     }
 }

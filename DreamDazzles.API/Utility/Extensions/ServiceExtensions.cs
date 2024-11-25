@@ -9,7 +9,8 @@ using DreamDazzles.Service.Interface;
 using DreamDazzles.Service.Service;
 using LoanCentral.API.Utility.Helper;
 using LoanCentral.API.Utility.Model;
- 
+using DreamDazzles.Service.Interface.Category;
+
 
 namespace DreamDazzles.API.Utility.Extensions;
 public static class ServiceExtensions
@@ -57,7 +58,9 @@ public static class ServiceExtensions
         services.AddTransient<IUsersRepository, UsersRepository>();
 
         services.AddTransient<IEmailService, EmailService>();
- 
+
+        services.AddTransient<ICategoryService, CategoryService>();
+        services.AddTransient<ICategoryRepository, CategoryRepository>();
 
 
 

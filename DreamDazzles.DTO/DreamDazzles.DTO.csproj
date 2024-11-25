@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DreamDazzle.Model\DreamDazzle.Model.csproj" />
+  </ItemGroup>
+
 </Project>
