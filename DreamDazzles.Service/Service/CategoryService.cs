@@ -1,6 +1,7 @@
 ﻿using DreamDazzle.Model;
 using DreamDazzle.Model.Data;
 using DreamDazzle.Repository.Interface;
+using DreamDazzle.Repository.Repositories;
 using DreamDazzles.DTO;
 using DreamDazzles.DTO.User;
 using DreamDazzles.Repository.Interface;
@@ -51,6 +52,30 @@ namespace DreamDazzles.Service.Service
         }
 
 
+        public async Task<ClientResponse> GetAll(string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _categoryRepository.GetAll(traceid, token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<ClientResponse> GetCategoryById(Guid productCategoryId, string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _categoryRepository.GetCategoryById(productCategoryId, traceid, token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<ClientResponse> AddSubCategory(SubCategoryDTO subCategory, string traceid, CancellationToken token = default)
         {
             try
@@ -74,6 +99,42 @@ namespace DreamDazzles.Service.Service
             {
 
                 throw;
+            }
+        }
+
+        public async Task<ClientResponse> GetAllSubCategory(string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _categoryRepository.GetAllSubCategory(traceid, token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<ClientResponse> GetSubCategoryById(Guid SubCategoryId, string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _categoryRepository.GetSubCategoryById(SubCategoryId, traceid, token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<ClientResponse> GetSubCategorylistByParentId(Guid ParentsCategory, string traceid, CancellationToken token = default)
+        {
+            try
+            {
+                return await _categoryRepository.GetSubCategorylistByParentId(ParentsCategory, traceid, token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
