@@ -98,8 +98,8 @@ namespace DreamDazzles.Repository.Repositories
             }
             return response;
         }
-   
-    public async Task<ClientResponse> DeleteProductCategory(Guid productCategoryId,string traceId, CancellationToken token = default)
+      
+        public async Task<ClientResponse> DeleteProductCategory(Guid productCategoryId,string traceId, CancellationToken token = default)
     {
         ClientResponse response = new();
         response.IsSuccess = false;
@@ -161,6 +161,107 @@ namespace DreamDazzles.Repository.Repositories
         return response;
     }
 
+        public async Task<ClientResponse> GetAll(string traceid, CancellationToken token = default)
+        {
+            ClientResponse<List<ProductCategoryDTO>> response = new();
+            string mname = "GetAllCategory";
+            response.IsSuccess = false;
+            response.HttpRequest = "";
+            if (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.ProductCategories.ToListAsync();
+
+
+                    if (pro != null && pro.Count > 0)
+                    {
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = pro;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+                    }
+
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
+                }
+                catch (Exception ex)
+                {
+
+                    response.Message = ex.Message;
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+            }
+            return response;
+        }
+
+        public async Task<ClientResponse> GetCategoryById(Guid productCategoryId, string traceid, CancellationToken token = default)
+        {
+            ClientResponse<ProductCategoryDTO> response = new();
+            string mname = "GetCategoryById";
+            response.IsSuccess = false;
+            response.HttpRequest = "";
+            if (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.ProductCategories.FirstOrDefaultAsync(x => x.ProductCategoryId == productCategoryId);
+
+                    if (pro != null)
+                    {
+                        ProductCategoryDTO res = new ProductCategoryDTO();
+
+                        res.ProductCategoryId = productCategoryId;
+                        res.ProductCategoryName = pro.ProductCategoryName;
+                        res.Description = pro.Description;
+                        res.CategoryImage = pro.CategoryImage;
+                        res.CreatedBy = pro.CreatedBy;
+                        res.CreatedDate = pro.CreatedDate;
+
+
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = res;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+
+                        _logger.LogInformation($"{mname}: {response.Message} | trace: " + traceid);
+                    }
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
+
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceid);
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+            }
+            return response;
+        }
 
         public async Task<ClientResponse> AddSubCategory(SubCategoryDTO subCategory, string traceid, CancellationToken token = default)
         {
@@ -270,7 +371,6 @@ namespace DreamDazzles.Repository.Repositories
                 {
                     var existingCategory = await _context.ProductSubCategories
                         .FirstOrDefaultAsync(x => x.SubCategoryId == SubCategoryId);
-                    existingCategory.IsDelete = false;
 
                     if (existingCategory == null)
                     {
@@ -315,6 +415,167 @@ namespace DreamDazzles.Repository.Repositories
                 response.StatusCode = HttpStatusCode.RequestTimeout;
             }
 
+            return response;
+        }
+
+        public async Task<ClientResponse> GetAllSubCategory(string traceid, CancellationToken token = default)
+        {
+            ClientResponse<List<SubCategoryDTO>> response = new();
+            string mname = "GetAllSubCategory";
+            response.IsSuccess = false;
+            response.HttpRequest = "";
+            if (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.ProductSubCategories.ToListAsync();
+
+
+                    if (pro != null && pro.Count > 0)
+                    {
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = pro;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+                    }
+
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
+                }
+                catch (Exception ex)
+                {
+
+                    response.Message = ex.Message;
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+            }
+            return response;
+        }
+
+        public async Task<ClientResponse> GetSubCategoryById(Guid SubCategoryId, string traceid, CancellationToken token = default)
+        {
+            ClientResponse<SubCategoryDTO> response = new();
+            string mname = "GetSubCategoryById";
+            response.IsSuccess = false;
+            response.HttpRequest = "";
+            if (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.ProductSubCategories.FirstOrDefaultAsync(x => x.SubCategoryId == SubCategoryId);
+
+                    if (pro != null)
+                    {
+                        SubCategoryDTO res = new SubCategoryDTO();
+
+                        res.SubCategoryId = SubCategoryId;
+                        res.SubCategoryName = pro.SubCategoryName;
+                        res.Description = pro.Description;
+                        res.ParentsCategory = pro.ParentsCategory;
+                        res.SubCategoryImage = pro.SubCategoryImage;
+                        res.CreatedBy = pro.CreatedBy;
+                        res.CreatedDate=pro.CreatedDate;
+
+
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = res;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+
+                        _logger.LogInformation($"{mname}: {response.Message} | trace: " + traceid);
+                    }
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
+
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceid);
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+            }
+            return response;
+        }
+
+        public async Task<ClientResponse> GetSubCategorylistByParentId(Guid ParentsCategory, string traceid, CancellationToken token = default)
+        {
+            ClientResponse<SubCategoryDTO> response = new();
+            string mname = "GetSubCategoryById";
+            response.IsSuccess = false;
+            response.HttpRequest = "";
+            if (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
+                    var pro = await _context.ProductSubCategories.FirstOrDefaultAsync(x => x.ParentsCategory == ParentsCategory);
+
+                    if (pro != null)
+                    {
+                        SubCategoryDTO res = new SubCategoryDTO();
+
+                        res.SubCategoryId = pro.SubCategoryId;
+                        res.SubCategoryName = pro.SubCategoryName;
+                        res.Description = pro.Description;
+                        res.ParentsCategory = pro.ParentsCategory;
+                        res.SubCategoryImage = pro.SubCategoryImage;
+                        res.CreatedBy = pro.CreatedBy;
+                        res.CreatedDate = pro.CreatedDate;
+
+
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.HttpResponse = res;
+                        response.Severity = SeverityType.status;
+                        response.IsSuccess = true;
+
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"{AppConstant.NoRecords}";
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Severity = SeverityType.warning;
+
+                        _logger.LogInformation($"{mname}: {response.Message} | trace: " + traceid);
+                    }
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
+
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceid);
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
+                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+            }
             return response;
         }
     }
