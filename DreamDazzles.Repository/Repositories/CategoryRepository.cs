@@ -290,6 +290,7 @@ namespace DreamDazzles.Repository.Repositories
                     if (!string.IsNullOrEmpty(subCategory.SubCategoryImage) && File.Exists(subCategory.SubCategoryImage))
                     {
                         var imageBytes = await File.ReadAllBytesAsync(subCategory.SubCategoryImage);
+
                         subCategory.SubCategoryImage = Convert.ToBase64String(imageBytes);
                     }
                     if (subCategory.Action == ActionEnum.Insert)
