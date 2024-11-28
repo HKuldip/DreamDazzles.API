@@ -35,19 +35,28 @@ namespace DreamDazzles.Repository.Repositories
             _mapper = mapper;
 
         }
-    
+
         public async Task<ClientResponse> AddProductCategory(ProductCategoryDTO productCategoryDTO, string traceid, CancellationToken token = default)
         {
             ClientResponse<ProductCategoryDTO> response = new();
             response.IsSuccess = false;
             string mname = "AddeditProductCategory";
+
             if (!token.IsCancellationRequested)
             {
                 _logger.LogInformation($"{productCategoryDTO.ProductCategoryId}: Entered | trace: " + traceid);
+
                 try
                 {
+                    if (!string.IsNullOrEmpty(productCategoryDTO.CategoryImage) && File.Exists(productCategoryDTO.CategoryImage))
+                    {
+                        var imageBytes = await File.ReadAllBytesAsync(productCategoryDTO.CategoryImage);
+                        productCategoryDTO.CategoryImage = Convert.ToBase64String(imageBytes);
+                    }
+
                     if (productCategoryDTO.Action == ActionEnum.Insert)
                     {
+                        productCategoryDTO.ProductCategoryId = new();
                         var model = _mapper.Map<ProductCategory>(productCategoryDTO);
                         await _context.ProductCategories.AddAsync(model);
                     }
@@ -64,11 +73,9 @@ namespace DreamDazzles.Repository.Repositories
                             existing.IsDelete = productCategoryDTO.IsDelete;
                             existing.CategoryImage = productCategoryDTO.CategoryImage;
 
-
                             _context.ProductCategories.Update(existing);
                         }
                     }
-
 
                     var res = await _context.SaveChangesAsync();
 
@@ -87,18 +94,19 @@ namespace DreamDazzles.Repository.Repositories
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "An error occurred while adding a product category.");
-                     response.Message = ex.Message;
-
+                    response.Message = ex.Message;
                 }
             }
+
             if (token.IsCancellationRequested)
             {
                 _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
                 response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
             }
+
             return response;
         }
-      
+
         public async Task<ClientResponse> DeleteProductCategory(Guid productCategoryId,string traceId, CancellationToken token = default)
     {
         ClientResponse response = new();
@@ -167,13 +175,13 @@ namespace DreamDazzles.Repository.Repositories
             string mname = "GetAllCategory";
             response.IsSuccess = false;
             response.HttpRequest = "";
+
             if (!token.IsCancellationRequested)
             {
                 try
                 {
                     _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
                     var pro = await _context.ProductCategories.ToListAsync();
-
 
                     if (pro != null && pro.Count > 0)
                     {
@@ -196,15 +204,19 @@ namespace DreamDazzles.Repository.Repositories
                 {
 
                     response.Message = ex.Message;
+                    response.StatusCode = HttpStatusCode.InternalServerError;
                 }
             }
+
             if (token.IsCancellationRequested)
             {
                 _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
                 response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
             }
+
             return response;
         }
+   
 
         public async Task<ClientResponse> GetCategoryById(Guid productCategoryId, string traceid, CancellationToken token = default)
         {
@@ -274,8 +286,15 @@ namespace DreamDazzles.Repository.Repositories
                 _logger.LogInformation($"{subCategory.SubCategoryId}: Entered | trace: " + traceid);
                 try
                 {
+
+                    if (!string.IsNullOrEmpty(subCategory.SubCategoryImage) && File.Exists(subCategory.SubCategoryImage))
+                    {
+                        var imageBytes = await File.ReadAllBytesAsync(subCategory.SubCategoryImage);
+                        subCategory.SubCategoryImage = Convert.ToBase64String(imageBytes);
+                    }
                     if (subCategory.Action == ActionEnum.Insert)
                     {
+                        
                         var parentCategory = await _context.ProductCategories.FindAsync(subCategory.ParentsCategory);
                         if (parentCategory == null)
                         {

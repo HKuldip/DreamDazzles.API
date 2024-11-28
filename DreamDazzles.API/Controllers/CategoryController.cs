@@ -116,8 +116,8 @@ namespace DreamDazzles.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $" Failed {methodName} - {httpMethod}");
             }
         }
-
-        [HttpGet("GetCategoryById/ProductCategoryId")]
+      
+        [HttpGet("GetCategoryById/{ProductCategoryId}")]
         [ApiVersion("1.0", Deprecated = true)]
         [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ClientResponse), StatusCodes.Status401Unauthorized)]
