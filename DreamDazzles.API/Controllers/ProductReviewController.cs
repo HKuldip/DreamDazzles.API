@@ -40,7 +40,6 @@ namespace DreamDazzles.API.Controllers
             try
             {
                 objresp = await _productReviewService.AddProductReview(productReviewDTO, traceId, token);
-
                 return Ok(objresp);
             }
             catch (Exception ex)
