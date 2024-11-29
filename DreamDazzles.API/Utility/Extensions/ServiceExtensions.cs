@@ -63,6 +63,8 @@ public static class ServiceExtensions
         services.AddTransient<ICategoryRepository, CategoryRepository>();
 
 
+        services.AddTransient<IProductReviewService, ProductReviewService>();
+        services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
 
         //services.AddTransient<IAccountSettingService, AccountSettingService>();
         //services.AddTransient<IAccountSettingRepository, AccountSettingRepository>();

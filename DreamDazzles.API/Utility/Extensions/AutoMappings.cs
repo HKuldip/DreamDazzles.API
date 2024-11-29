@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using DreamDazzle.DTO;
 using DreamDazzle.Model;
 using DreamDazzles.DTO;
+using DreamDazzles.DTO.Product;
 
 namespace DreamDazzles.API.Utility.Extension
 {
@@ -13,6 +15,12 @@ namespace DreamDazzles.API.Utility.Extension
 
             CreateMap<SubCategory, SubCategoryDTO>();
             CreateMap<SubCategoryDTO, SubCategory>();
+
+            CreateMap<ProductReview, ProductReviewDTO>();
+            CreateMap<ProductReviewDTO, ProductReview>();
+
+            CreateMap<Product, ProductDTO>();
+            CreateMap<ProductDTO, Product>();
 
         }
 
