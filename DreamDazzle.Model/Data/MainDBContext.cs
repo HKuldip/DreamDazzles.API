@@ -20,6 +20,8 @@ namespace DreamDazzle.Model.Data
         public DbSet<ProductCategory> ProductCategories { get; set; }
        public DbSet<SubCategory> ProductSubCategories { get; set; }
 
+        public DbSet<ProductReview> ProductReviews { get; set; }
+
         #endregion
         /// <summary>
         /// Configures the MainContext
@@ -54,6 +56,7 @@ namespace DreamDazzle.Model.Data
 
             builder.Entity<ProductCategory>().ToTable("ProductCategory");
             builder.Entity<SubCategory>().ToTable("SubCategory");
+            builder.Entity<ProductReview>().ToTable("ProductReview");
         }
        
 

@@ -70,6 +70,7 @@ namespace DreamDazzle.Model.Data
 
         /// <remarks/>
         error,
+        Status,
     }
         
     public enum CodeMinorValueType
