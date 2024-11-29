@@ -182,36 +182,39 @@ namespace DreamDazzles.Repository.Repositories
             }
             return response;
         }
-        public async Task<ClientResponse> GetReviewByProductId(Guid ProductId, string traceid, CancellationToken token = default)
+        public async Task<ClientResponse> GetReviewByProductId(Guid productId, string traceId, CancellationToken token = default)
         {
-            ClientResponse<ProductCategoryDTO> response = new();
-            string mname = "GetReviewById";
+            ClientResponse<List<ProductReviewDTO>> response = new();
+            string mname = "GetReviewsByProductId";
             response.IsSuccess = false;
             response.HttpRequest = "";
+
             if (!token.IsCancellationRequested)
             {
                 try
                 {
-                    _logger.LogInformation($"{mname}: Entered | trace: " + traceid);
-                    var pro = await _context.ProductReviews.FirstOrDefaultAsync(x => x.ProductId == ProductId);
+                    _logger.LogInformation($"{mname}: Entered | trace: " + traceId);
 
-                    if (pro != null)
+                    var reviews = await _context.ProductReviews
+                                                .Where(x => x.ProductId == productId)
+                                                .ToListAsync(token);
+
+                    if (reviews != null && reviews.Any())
                     {
-                        ProductReviewDTO res = new ProductReviewDTO();
-
-                        res.ProductReviewId = ProductId;
-                        res.ProductId = pro.ProductId;
-                        res.Description = pro.Description;
-                        res.UserId = pro.UserId;
-                        res.Ratings = pro.Ratings;
-                        res.ReviewDate = pro.ReviewDate;
-
+                        var reviewDtos = reviews.Select(pro => new ProductReviewDTO
+                        {
+                            ProductReviewId = pro.ProductReviewId,
+                            ProductId = pro.ProductId,
+                            Description = pro.Description,
+                            UserId = pro.UserId,
+                            Ratings = pro.Ratings,
+                            ReviewDate = pro.ReviewDate
+                        }).ToList();
 
                         response.StatusCode = HttpStatusCode.OK;
-                        response.HttpResponse = res;
+                        response.HttpResponse = reviewDtos;
                         response.Severity = SeverityType.status;
                         response.IsSuccess = true;
-
                     }
                     else
                     {
@@ -220,23 +223,26 @@ namespace DreamDazzles.Repository.Repositories
                         response.StatusCode = HttpStatusCode.NoContent;
                         response.Severity = SeverityType.warning;
 
-                        _logger.LogInformation($"{mname}: {response.Message} | trace: " + traceid);
+                        _logger.LogInformation($"{mname}: {response.Message} | trace: " + traceId);
                     }
-                    _logger.LogInformation($"{mname}: Exit | trace: " + traceid);
 
+                    _logger.LogInformation($"{mname}: Exit | trace: " + traceId);
                     return response;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceid);
+                    _logger.LogError($"{mname}: Error => {ex.Message} | trace: " + traceId);
                 }
             }
+
             if (token.IsCancellationRequested)
             {
-                _logger.LogInformation($"{mname}: Request has cancelled.. | trace: " + traceid);
-                response.Message = $"{mname}: Request has cancelled.. | trace: " + traceid;
+                _logger.LogInformation($"{mname}: Request has been cancelled. | trace: " + traceId);
+                response.Message = $"{mname}: Request has been cancelled. | trace: " + traceId;
             }
+
             return response;
         }
+
     }
 }
